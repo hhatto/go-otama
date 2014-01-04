@@ -3,5 +3,8 @@ go:
     - 1.1
     - tip
 
+install:
+    - wget "https://raw.github.com/hhatto/otamapy/master/tools/install-libotama.sh" && sh install-libotama.sh
+
 script:
     - go test -v ./
