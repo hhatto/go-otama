@@ -41,15 +41,15 @@ func goobj2variant(o map[string]string, v C.otama_variant_t) {
 
 func make_results(raw_results *C.otama_result_t) ([]OtamaResult) {
     var _id C.otama_id_t
-    var result_num = int(C.otama_result_count(raw_results))
-    print(result_num)
-    var results []OtamaResult
-    //var value *C.otama_variant_t
     var hexid[C.OTAMA_ID_HEXSTR_LEN] C.char
+    var result_num = int(C.otama_result_count(raw_results))
+    var results []OtamaResult
+
+    if result_num != 0 {
+        results = make([]OtamaResult, result_num)
+    }
 
     for i := 0; i < result_num; i++ {
-        print(i)
-        //value = C.otama_result_value(raw_results, C.int(i));
         C.otama_id_bin2hexstr(&hexid[0], &_id)
 
         results[i] = OtamaResult{id: C.GoStringN(&hexid[0], C.OTAMA_ID_HEXSTR_LEN),
@@ -111,10 +111,20 @@ func (o *Otama) Insert(filename string) (id string, err error) {
     return C.GoStringN(&hexid[0], C.OTAMA_ID_HEXSTR_LEN), err
 }
 
+func (o *Otama) Pull() (err error) {
+    ret := C.otama_pull(o.otama)
+    if ret != C.OTAMA_STATUS_OK {
+        buf := bytes.NewBufferString("otama_pull: ")
+        buf.WriteString(get_status_message(ret))
+        return errors.New(buf.String())
+    }
+
+    return nil
+}
+
 func (o *Otama) Search(num int, filename string) (results []OtamaResult, err error) {
     var otama_results *C.otama_result_t
 
-    println(filename, num)
     ret := C.otama_search_file(o.otama, &otama_results, C.int(num), C.CString(filename))
     if ret != C.OTAMA_STATUS_OK {
         buf := bytes.NewBufferString("otama_search_file: ")

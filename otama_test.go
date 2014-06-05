@@ -65,12 +65,16 @@ func create_dataset(t *testing.T, o *Otama, pwd string) (ids []map[string]string
         return nil
     })
 
+    err := o.Pull()
+    if err != nil {
+        t.Error(err)
+        return nil
+    }
+
     return ids
 }
 
 func TestOtamaInsertAndSearch(t *testing.T) {
-    t.Skip("not implement")
-
     o := setup()
     o.Open("test.conf")
     o.CreateDatabase()
@@ -88,7 +92,7 @@ func TestOtamaInsertAndSearch(t *testing.T) {
         t.Errorf("result not found")
     }
     for result := range results {
-        fmt.Println(result)
+        fmt.Println(fmt.Sprintf("key=%s, sim=%0.3f", results[result].id, results[result].similarity))
     }
 }
 
