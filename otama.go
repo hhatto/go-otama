@@ -8,6 +8,7 @@ package otama
 import "C"
 
 import (
+    "fmt"
     "bytes"
     "errors"
 )
@@ -36,24 +37,49 @@ func get_status_message(ret C.otama_status_t) (string) {
     return C.GoString(C.otama_status_message(ret))
 }
 
+func variant2goobj(v *C.otama_variant_t) (float64) {
+    switch C.otama_variant_type(v) {
+    case C.OTAMA_VARIANT_TYPE_INT:
+        return float64(C.otama_variant_to_int(v))
+    case C.OTAMA_VARIANT_TYPE_FLOAT:
+        return float64(C.otama_variant_to_float(v))
+    case C.OTAMA_VARIANT_TYPE_HASH:
+        var keys *C.otama_variant_t = C.otama_variant_hash_keys(v)
+        return float64(variant2goobj(C.otama_variant_hash_at2(v, C.otama_variant_array_at(keys, 0))))
+    case C.OTAMA_VARIANT_TYPE_STRING:
+        fmt.Println("string")
+        break
+    case C.OTAMA_VARIANT_TYPE_ARRAY:
+        fmt.Println("array")
+        break
+    case C.OTAMA_VARIANT_TYPE_NULL:
+        fmt.Println("null")
+        break
+    default:
+        fmt.Println("other")
+    }
+    return 1
+}
+
 func goobj2variant(o map[string]string, v C.otama_variant_t) {
 }
 
 func make_results(raw_results *C.otama_result_t) ([]OtamaResult) {
-    var _id C.otama_id_t
     var hexid[C.OTAMA_ID_HEXSTR_LEN] C.char
     var result_num = int(C.otama_result_count(raw_results))
     var results []OtamaResult
+    var value *C.otama_variant_t
 
     if result_num != 0 {
         results = make([]OtamaResult, result_num)
     }
 
     for i := 0; i < result_num; i++ {
-        C.otama_id_bin2hexstr(&hexid[0], &_id)
+        value = C.otama_result_value(raw_results, C.int(i))
+        C.otama_id_bin2hexstr(&hexid[0], C.otama_result_id(raw_results, C.int(i)))
 
         results[i] = OtamaResult{id: C.GoStringN(&hexid[0], C.OTAMA_ID_HEXSTR_LEN),
-                                 similarity: 0.0}
+                                 similarity: variant2goobj(value)}
     }
 
     return results
