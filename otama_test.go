@@ -92,7 +92,7 @@ func TestOtamaInsertAndSearch(t *testing.T) {
         t.Errorf("result not found")
     }
     for result := range results {
-        fmt.Println(fmt.Sprintf("key=%s, sim=%0.3f", results[result].id, results[result].similarity))
+        fmt.Println(fmt.Sprintf("key=%s, sim=%0.3f", results[result].Id, results[result].Similarity))
     }
 }
 
