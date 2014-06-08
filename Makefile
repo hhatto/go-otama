@@ -5,7 +5,7 @@ all:
 	@echo "clean"
 
 install:
-	go get github.com/hhatto/go-otama
+	go get -v -u github.com/hhatto/go-otama
 
 test:
 	go test
