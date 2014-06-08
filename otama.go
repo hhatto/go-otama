@@ -23,8 +23,8 @@ type Otama struct {
 }
 
 type OtamaResult struct {
-    id string
-    similarity float64
+    Id string
+    Similarity float64
 }
 
 type OtamaFeatureRaw struct {
@@ -78,8 +78,8 @@ func make_results(raw_results *C.otama_result_t) ([]OtamaResult) {
         value = C.otama_result_value(raw_results, C.int(i))
         C.otama_id_bin2hexstr(&hexid[0], C.otama_result_id(raw_results, C.int(i)))
 
-        results[i] = OtamaResult{id: C.GoStringN(&hexid[0], C.OTAMA_ID_HEXSTR_LEN),
-                                 similarity: variant2goobj(value)}
+        results[i] = OtamaResult{Id: C.GoStringN(&hexid[0], C.OTAMA_ID_HEXSTR_LEN),
+                                 Similarity: variant2goobj(value)}
     }
 
     return results
