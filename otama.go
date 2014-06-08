@@ -8,11 +8,10 @@ package otama
 import "C"
 
 import (
-    "fmt"
     "bytes"
     "errors"
+    "fmt"
 )
-
 
 const (
     LIBOTAMA_VERSION = C.OTAMA_VERSION
@@ -29,15 +28,14 @@ type OtamaResult struct {
 
 type OtamaFeatureRaw struct {
     base Otama
-    raw *C.otama_feature_raw_t
+    raw  *C.otama_feature_raw_t
 }
 
-
-func get_status_message(ret C.otama_status_t) (string) {
+func get_status_message(ret C.otama_status_t) string {
     return C.GoString(C.otama_status_message(ret))
 }
 
-func variant2goobj(v *C.otama_variant_t) (float64) {
+func variant2goobj(v *C.otama_variant_t) float64 {
     switch C.otama_variant_type(v) {
     case C.OTAMA_VARIANT_TYPE_INT:
         return float64(C.otama_variant_to_int(v))
@@ -64,8 +62,8 @@ func variant2goobj(v *C.otama_variant_t) (float64) {
 func goobj2variant(o map[string]string, v C.otama_variant_t) {
 }
 
-func make_results(raw_results *C.otama_result_t) ([]OtamaResult) {
-    var hexid[C.OTAMA_ID_HEXSTR_LEN] C.char
+func make_results(raw_results *C.otama_result_t) []OtamaResult {
+    var hexid [C.OTAMA_ID_HEXSTR_LEN]C.char
     var result_num = int(C.otama_result_count(raw_results))
     var results []OtamaResult
     var value *C.otama_variant_t
@@ -124,7 +122,7 @@ func (o *Otama) DropDatabase() (err error) {
 
 func (o *Otama) Insert(filename string) (id string, err error) {
     var _id C.otama_id_t
-    var hexid[C.OTAMA_ID_HEXSTR_LEN] C.char
+    var hexid [C.OTAMA_ID_HEXSTR_LEN]C.char
 
     ret := C.otama_insert_file(o.otama, &_id, C.CString(filename))
     if ret != C.OTAMA_STATUS_OK {
@@ -159,7 +157,7 @@ func (o *Otama) Search(num int, filename string) (results []OtamaResult, err err
     }
 
     results = make_results(otama_results)
-    C.otama_result_free(&otama_results);
+    C.otama_result_free(&otama_results)
 
     return results, err
 }
@@ -169,7 +167,7 @@ func (o *Otama) Exists(id string) (r bool, err error) {
     var ret C.otama_status_t
     var result C.int
 
-    ret = C.otama_id_hexstr2bin(&otama_id, C.CString(id));
+    ret = C.otama_id_hexstr2bin(&otama_id, C.CString(id))
     if ret != C.OTAMA_STATUS_OK {
         buf := bytes.NewBufferString("Exists otama_id_hexstr2bin: ")
         buf.WriteString(get_status_message(ret))
@@ -185,6 +183,8 @@ func (o *Otama) Exists(id string) (r bool, err error) {
         return false, err
     }
 
-    if int(result) == 0 { return false, err }
+    if int(result) == 0 {
+        return false, err
+    }
     return true, err
 }
