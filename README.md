@@ -68,5 +68,5 @@ func main() {
 
 ## License
 
-  * MIT
+  * GPLv3
 
